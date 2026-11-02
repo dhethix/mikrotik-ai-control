@@ -5,6 +5,7 @@
 **AI agent + web UI to manage MikroTik RouterOS via the REST API.**
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/dhethix/mikrotik-ai-control?style=flat-square&logo=docker&color=blue)](https://hub.docker.com/r/dhethix/mikrotik-ai-control)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-dhethix%2Fmikrotik--ai--control-2496ED?style=flat-square&logo=docker&logoColor=white)](https://hub.docker.com/r/dhethix/mikrotik-ai-control)
 ![Architecture](https://img.shields.io/badge/arch-amd64%20%7C%20arm64-brightgreen?style=flat-square)
 ![Status](https://img.shields.io/badge/status-active-success?style=flat-square)
 
@@ -24,6 +25,7 @@
 > **Not** an official MikroTik, OpenRouter, or Groq product. This is a community project — please use at your own risk.
 
 ## 📑 Table of Contents
+- [📦 Docker Hub](#-docker-hub)
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
 - [🔑 Get an API Key](#-get-an-api-key)
@@ -33,6 +35,16 @@
   - [RouterOS Container Host](#routeros-container-host)
 - [🛠️ Environment Variables](#️-environment-variables)
 - [🏷️ Docker Tags](#️-docker-tags)
+
+---
+
+## 📦 Docker Hub
+
+The official image is available on Docker Hub:
+
+🔗 **[https://hub.docker.com/r/dhethix/mikrotik-ai-control](https://hub.docker.com/r/dhethix/mikrotik-ai-control)**
+
+You can pull the latest version directly from there, or use the specific tags listed below.
 
 ---
 
@@ -49,7 +61,7 @@
 
 ## 🚀 Quick Start
 
-Run the container instantly:
+Pull the image from Docker Hub and run the container:
 
 ```bash
 docker pull dhethix/mikrotik-ai-control:0.2.0
