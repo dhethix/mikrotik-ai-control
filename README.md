@@ -18,7 +18,7 @@
 ## 📸 Dashboard Preview
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/dhethix/mikrotik-ai-control/main/dashboard.jpg" alt="MikroTik AI Control Dashboard Preview" width="100%" style="border-radius: 8px;">
+  <img src="https://raw.githubusercontent.com/dhethix/mikrotik-ai-control/main/Dashboard.jpg" alt="MikroTik AI Control Dashboard Preview" width="100%" style="border-radius: 8px;">
 </div>
 
 ---
