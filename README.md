@@ -2,14 +2,14 @@
 
 # 🤖 MikroTik AI Control
 
-**AI agent + web dashboard to operate MikroTik RouterOS via REST API**
+**AI agent and web dashboard to operate MikroTik RouterOS via REST API, using OpenRouter and/or Groq.**
 
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-dhethix%2Fmikrotik--ai--control-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/dhethix/mikrotik-ai-control)
-[![Platform](https://img.shields.io/badge/platform-linux%2Famd64%20%7C%20linux%2Farm64-blue)](#-image-tags)
-[![UI](https://img.shields.io/badge/UI-EN%20%2F%20ID-7c5cff)](#-features)
-[![License](https://img.shields.io/badge/license-Community-gray)](#-safety--disclaimer)
+[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue?logo=python&logoColor=white)](#requirements)
+[![UI Language](https://img.shields.io/badge/UI-EN%20%2F%20ID-7c5cff)](#features)
+[![License](https://img.shields.io/badge/license-Community-gray)](#disclaimer)
 
-[Docker Hub](https://hub.docker.com/r/dhethix/mikrotik-ai-control) · [Tags](https://hub.docker.com/r/dhethix/mikrotik-ai-control/tags) · [OpenRouter](https://openrouter.ai) · [Groq](https://console.groq.com)
+[Docker Hub](https://hub.docker.com/r/dhethix/mikrotik-ai-control) · [Image Tags](https://hub.docker.com/r/dhethix/mikrotik-ai-control/tags) · [OpenRouter](https://openrouter.ai/keys) · [Groq Console](https://console.groq.com/keys)
 
 </div>
 
@@ -18,41 +18,34 @@
 ## 📸 Dashboard Preview
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/dhethix/mikrotik-ai-control/main/Dashboard.jpg" alt="MikroTik AI Control Dashboard Preview" width="100%" style="border-radius: 8px;">
+  <img src="https://raw.githubusercontent.com/dhethix/mikrotik-ai-control/main/dashboard.jpg" alt="MikroTik AI Control Dashboard Preview" width="100%">
 </div>
 
 ---
 
-## 💡 What it is
+## 📁 Repository contents
 
-**MikroTik AI Control** is a containerized assistant that connects to your **real MikroTik router** over HTTPS REST. You chat in a dark, admin-style web UI; the agent calls RouterOS tools (resources, interfaces, PPPoE, containers, and more) with **dry-run** and **confirm** safety by default.
+| File / folder | Role |
+|---------------|------|
+| `agent.py` | FastAPI backend, LLM tools, SQLite sessions & settings |
+| `static/` | Web UI (built assets served by the agent) |
+| `requirements.txt` | Python dependencies |
+| `start.sh` | Simple process entry (`python -u agent.py`) |
+| `env.example` | Optional environment variable sample |
 
-### 🛠 Tech Stack
-
-| Layer | Stack |
-|:---|:---|
-| **UI** | React + Vite (English / Indonesian) |
-| **API** | FastAPI + SQLite sessions & settings |
-| **LLM** | **OpenRouter** and/or **Groq** (free-tier capable models) |
-| **Router** | MikroTik RouterOS REST (`/rest/...`) |
-
-> ⚠️ **Disclaimer:** **Not** an official MikroTik, OpenRouter, or Groq product. Community project — use at your own risk.
+> ℹ️ This repo is **runtime source** (backend + UI assets). It does not ship Docker Hub docs or a Vite app tree.
 
 ---
 
-## ✨ Features
+## 📋 Requirements
 
-- 🖥️ **Web dashboard** — chat, sessions, live metrics (CPU, RAM, PPPoE, throughput)
-- ⚡ **Dual providers** — OpenRouter + Groq; switch model in Settings
-- 🌐 **EN / ID UI** — language stored in SQLite; survives container restart
-- 🛡️ **Safety** — Dry-run & Confirm (default **ON**)
-- 💾 **Persistent data** — sessions, API keys, router credentials, UI language under `/app/data`
-- 🔒 **No secrets in the image** — configure via UI (or optional env)
-- 🏗️ **Multi-arch images** — `linux/amd64` and `linux/arm64`
+- **Python 3.12+** (or Docker image from Hub)
+- **RouterOS** with REST (`www-ssl`) enabled and an API-capable user
+- **API Key:** [OpenRouter](https://openrouter.ai/keys) and/or [Groq](https://console.groq.com/keys)
 
 ---
 
-## 🚀 Quick start (Docker Hub)
+## 🚀 Run with the official image (recommended)
 
 ```bash
 docker pull dhethix/mikrotik-ai-control:latest
@@ -63,23 +56,70 @@ docker run -d --name mikrotik-ai \
   dhethix/mikrotik-ai-control:latest
 ```
 
-### Initial Configuration:
 1. Open **http://localhost:8000**
-2. Click **Settings** (gear icon)
-3. Paste an **OpenRouter** or **Groq** API key → validate
-4. Enter MikroTik **IP / user / password**
-5. **Save & apply** — start a **New Session** and chat
+2. Go to **Settings**
+3. Enter your **API key** + **MikroTik host/user/password**
+4. Click **Save**.
 
-📦 **Docker Hub Repository:** [hub.docker.com/r/dhethix/mikrotik-ai-control](https://hub.docker.com/r/dhethix/mikrotik-ai-control)
+📌 **Available Image Tags:** `latest`, `0.2.0`, `0.2.0-amd64`, `0.2.0-arm64`  
+👉 Browse tags: [hub.docker.com/r/dhethix/mikrotik-ai-control/tags](https://hub.docker.com/r/dhethix/mikrotik-ai-control/tags)
 
 ---
 
-## 🐳 docker-compose
+## 🐍 Run from this source (Python)
+
+```bash
+# Create virtual environment
+python -m venv .venv
+
+# Activate virtual environment
+# Linux/macOS:
+source .venv/bin/activate
+# Windows:
+# .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+# optional: copy env.example to .env and edit
+
+# Run agent
+chmod +x start.sh   # Linux/macOS
+./start.sh          # or: python -u agent.py
+```
+
+* **Default:** HTTP UI on `0.0.0.0:8000`, persistent data saved under `./data` or `DATA_DIR`.
+* **Important:** Mount/persist the data directory in production so sessions and settings survive container restarts.
+
+---
+
+## 🐳 Optional: Docker build yourself
+
+A `Dockerfile` is **not** included in this repo (to keep the tree focused on application source). Here is a minimal example if you want to build locally:
+
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt agent.py start.sh ./
+COPY static ./static
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+ && pip install --no-cache-dir -r requirements.txt \
+ && mkdir -p /app/data && chmod +x /app/start.sh
+ENV MODE=http HTTP_HOST=0.0.0.0 HTTP_PORT=8000
+CMD ["./start.sh"]
+```
+
+```bash
+docker build -t mikrotik-ai-control:local .
+docker run -d -p 8000:8000 -v mikrotik-ai-data:/app/data mikrotik-ai-control:local
+```
+
+### 📦 Optional: docker-compose
 
 ```yaml
 services:
   mikrotik-ai:
     image: dhethix/mikrotik-ai-control:latest
+    # or build: { context: . } if you added a Dockerfile
     ports:
       - "8000:8000"
     volumes:
@@ -90,145 +130,57 @@ volumes:
   mikrotik-ai-data:
 ```
 
----
+### 💾 Optional: export for RouterOS container
 
-## 🏷️ Image tags
-
-| Tag | Meaning |
-|:---|:---|
-| `latest` | Newest stable multi-arch |
-| `0.2.0` | Versioned multi-arch release |
-| `0.2.0-amd64` | AMD64 only (PC, CHR, many x86 containers) |
-| `0.2.0-arm64` | ARM64 only (Pi, ARM VPS, some ARM routers) |
-
-```bash
-docker pull dhethix/mikrotik-ai-control:0.2.0
-docker pull dhethix/mikrotik-ai-control:0.2.0-amd64
-docker pull dhethix/mikrotik-ai-control:0.2.0-arm64
-```
-
-🔍 Browse available tags: [hub.docker.com/r/dhethix/mikrotik-ai-control/tags](https://hub.docker.com/r/dhethix/mikrotik-ai-control/tags)
-
----
-
-## 🔑 API keys (free-tier friendly)
-
-### Option A: Groq (fast)
-1. Open [console.groq.com/keys](https://console.groq.com/keys)
-2. **Create API Key** → copy `gsk_...`
-
-### Option B: OpenRouter (many models)
-1. Open [openrouter.ai/keys](https://openrouter.ai/keys)
-2. **Create Key** → copy `sk-or-v1-...`
-
-> 💡 Paste the key in the web **Settings** panel (preferred over baking env into the image).
-
----
-
-## ⚙️ RouterOS preparation
-
-Run the following commands on your RouterOS device to allow REST API connection:
-
-```routeros
-/ip service enable www-ssl
-/user group add name=ai-group policy=api,read,write,test,policy,password
-/user add name=ai-agent group=ai-group password="STRONG_PASSWORD"
-```
-
-Point the agent at the router IP, that user, and password in **Settings**.
-
----
-
-## 📦 Run on MikroTik container
-
-1. Pull a **single-arch** tag that matches the router (`-amd64` or `-arm64`).
-2. Save a Docker V2 archive (must include `manifest.json`):
+Use a **single-arch** Hub tag, then export:
 
 ```bash
 docker pull dhethix/mikrotik-ai-control:0.2.0-amd64
 docker save dhethix/mikrotik-ai-control:0.2.0-amd64 -o mikrotik-agent.tar
 ```
 
-3. Upload the tar, create the container, **mount** host storage to **`/app/data`**, publish port **8000**.
+Import on the router; mount storage to **`/app/data`**, and publish port **8000**.  
+*(For a flat single-layer export workflow, use the tooling from the full project release or Hub image as above.)*
 
----
+### 📄 Optional: `.dockerignore`
 
-## 🛠️ Optional environment
-
-Defaults are safe for first boot. Prefer **Settings** in the UI.
-
-| Variable | Default | Notes |
-|:---|:---|:---|
-| `MODE` | `http` | HTTP + web UI |
-| `HTTP_HOST` | `0.0.0.0` | Listen address |
-| `HTTP_PORT` | `8000` | Listen port |
-| `VERIFY_SSL` | `false` | Router TLS verify |
-| `MIKROTIK_PORT` | `443` | REST port |
-| `DRY_RUN` | `true` | Simulate writes |
-| `REQUIRE_CONFIRMATION` | `true` | Confirm before write |
-| `DATA_DIR` | `/app/data` | Persistent volume path |
-
----
-
-## 🏗️ Build from source
-
-```bash
-# UI
-cd web && npm install && npm run build   # or build-ui.bat / build-ui.sh
-
-# Image (local)
-docker build --platform linux/amd64 -t mikrotik-ai-control:local .
-
-# Multi-arch push to Hub (maintainers)
-export HUB_USER=dhethix
-export IMAGE=mikrotik-ai-control
-export VERSION=0.2.0
-bash build-push-hub.sh
-```
-
----
-
-## 📂 Project layout
-
+Only relevant if you add a Dockerfile. Typical ignores:
 ```text
-├── agent.py           # FastAPI agent, tools, SQLite
-├── Dockerfile
-├── static/            # Built web UI (served by agent)
-├── web/               # Vite/React source
-├── build-export.sh    # Flat image tar for RouterOS
-├── build-push-hub.sh  # multi-arch Hub publish
-├── DOCKERHUB.md       # Hub full description
-└── data/              # runtime DB (volume mount in production)
+.git
+.venv
+data/
+.env
+*.md
 ```
 
 ---
 
-## 🛡️ Safety & disclaimer
+## ✨ Features
 
-- Dry-run and confirm reduce accidental writes; turn them off only when you understand the impact.
-- API keys and router passwords live in the **volume** database — protect `/app/data`.
-- With safety off, the agent can change live RouterOS configuration.
-- **No warranty.** Community software. Not affiliated with MikroTik, OpenRouter, or Groq.
+- 💾 **SQLite Storage** — Sessions and settings saved in `/app/data` or `DATA_DIR`
+- ⚡ **Dual AI Providers** — OpenRouter + Groq support
+- 🛡️ **Safety Guard** — Dry-run & confirm safety mode
+- 📊 **Live Metrics** — Real-time telemetry from the router
+- 🌐 **Multi-language** — UI language toggle (EN / ID)
+
+---
+
+## ⚙️ Configuration
+
+Prefer using the **Settings** panel in the Web UI (keys and router credentials are stored securely in the DB on the data volume).
+
+**Optional Environment Variables** (see `env.example`):  
+`MODE`, `HTTP_HOST`, `HTTP_PORT`, `VERIFY_SSL`, `MIKROTIK_PORT`, `DRY_RUN`, `REQUIRE_CONFIRMATION`, `DATA_DIR`, `API_TOKEN`.
+
+---
+
+## ⚠️ Disclaimer
+
+Community project. Not affiliated with MikroTik, OpenRouter, or Groq. Use at your own risk.
 
 ---
 
 ## 🔗 Links
 
-| Resource | URL |
-|:---|:---|
-| **Docker Hub** | [hub.docker.com/r/dhethix/mikrotik-ai-control](https://hub.docker.com/r/dhethix/mikrotik-ai-control) |
-| **Tags** | [hub.docker.com/r/dhethix/mikrotik-ai-control/tags](https://hub.docker.com/r/dhethix/mikrotik-ai-control/tags) |
-| **OpenRouter** | [openrouter.ai](https://openrouter.ai) |
-| **Groq** | [console.groq.com](https://console.groq.com) |
-
----
-
-<div align="center">
-
-**Pull · Configure · Chat with your router**
-
-```bash
-docker pull dhethix/mikrotik-ai-control:latest
-```
-
-</div>
+- **Docker Hub:** [hub.docker.com/r/dhethix/mikrotik-ai-control](https://hub.docker.com/r/dhethix/mikrotik-ai-control)
+- **Image Tags:** [hub.docker.com/r/dhethix/mikrotik-ai-control/tags](https://hub.docker.com/r/dhethix/mikrotik-ai-control/tags)
